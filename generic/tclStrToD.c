@@ -1630,6 +1630,10 @@ MakeLowPrecisionDouble(
     double retval;		/* Value of the number. */
     mp_int significandBig;	/* Significand expressed as a bignum. */
 
+    if (significand == 0) {
+	return copysign(0.0, -signum);
+    }
+
     /*
      * With gcc on x86, the floating point rounding mode is double-extended.
      * This causes the result of double-precision calculations to be rounded
@@ -1644,9 +1648,6 @@ MakeLowPrecisionDouble(
      * Test for the easy cases.
      */
 
-    if (significand == 0) {
-	return copysign(0.0, -signum);
-    }
     if (numSigDigs <= QUICK_MAX) {
 	if (exponent >= 0) {
 	    if (exponent <= mmaxpow) {
@@ -1747,6 +1748,10 @@ MakeHighPrecisionDouble(
     double retval;
     int machexp;		/* Machine exponent of a power of 10. */
 
+    if (mp_iszero(significand)) {
+	return copysign(0.0, -signum);
+    }
+
     /*
      * With gcc on x86, the floating point rounding mode is double-extended.
      * This causes the result of double-precision calculations to be rounded
@@ -1762,9 +1767,6 @@ MakeHighPrecisionDouble(
      * integer overflow when calculating with 'exponent'.
      */
 
-    if (mp_iszero(significand)) {
-	return copysign(0.0, -signum);
-    }
     if (exponent >= 0 && exponent-1 > maxDigits-numSigDigs) {
 	retval = HUGE_VAL;
 	goto returnValue;
